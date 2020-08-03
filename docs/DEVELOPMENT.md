@@ -1,16 +1,15 @@
 # Development <!-- omit in toc -->
 
+> Getting started with development on IPFS
+
+## Table of contents <!-- omit in toc -->
+
 - [Clone and install dependencies](#clone-and-install-dependencies)
 - [Run tests](#run-tests)
+  - [Run interop tests](#run-interop-tests)
+  - [Run benchmark tests](#run-benchmark-tests)
 - [Lint](#lint)
 - [Build a dist version](#build-a-dist-version)
-- [Publishing new versions](#publishing-new-versions)
-- [Using prerelease versions](#using-prerelease-versions)
-- [Testing strategy](#testing-strategy)
-  - [CLI](#cli)
-  - [HTTP API](#http-api)
-  - [Core](#core)
-  - [Non-Core](#non-core)
 
 ## Clone and install dependencies
 
@@ -20,35 +19,67 @@
 > npm install
 ```
 
-This will install [lerna](https://www.npmjs.com/package/lerna) and bootstrap the various packages, deduping and hoisting dependencies into the root folder.
-
-If later you add new dependencies to submodules or just wish to remove all the `node_modules`/`dist` folders and start again, run `npm run reset && npm install` from the root.
-
-See the scripts section of the root [`package.json`](./package.json) for more commands.
-
 ## Run tests
 
 ```sh
 # run all the unit tests
 > npm test
 
+# run individual tests (findprovs)
+> npm run test -- --grep findprovs
+
 # run just IPFS tests in Node.js
 > npm run test:node
 
-# run just IPFS tests in a browser
+# run just IPFS core tests
+> npm run test:node:core
+
+# run just IPFS HTTP-API tests
+> npm run test:node:http
+
+# run just IPFS CLI tests
+> npm run test:cli
+
+# run just IPFS core tests in the Browser (Chrome)
 > npm run test:browser
 
-# run just IPFS tests in a webworker
-> npm run test:webworker
+# run some interface tests (block API) on Node.js
+> npm run test:node:interface -- --grep '.block'
 ```
 
-More granular test suites can be run from each submodule.
+### Run interop tests
 
-Please see the `package.json` in each submodule for available commands.
+
+```sh
+# run the interop tests with the default go-IPFS
+> npm run test:interop
+
+# run the interop tests with a different go-IPFS
+> IPFS_EXEC_GO=/path/to/ipfs npm run test:interop
+```
+
+### Run benchmark tests
+
+```sh
+# run all the benchmark tests
+> npm run benchmark
+
+# run just IPFS benchmarks in Node.js
+> npm run benchmark:node
+
+# run just IPFS benchmarks in Node.js for an IPFS instance
+> npm run benchmark:node:core
+
+# run just IPFS benchmarks in Node.js for an IPFS daemon
+> npm run benchmark:node:http
+
+# run just IPFS benchmarks in the browser (Chrome)
+> npm run benchmark:browser
+```
 
 ## Lint
 
-Please run the linter before submitting a PR, the build will not pass if it fails:
+**Conforming to linting rules is a prerequisite to commit to js-ipfs.**
 
 ```sh
 > npm run lint
@@ -59,47 +90,3 @@ Please run the linter before submitting a PR, the build will not pass if it fail
 ```sh
 > npm run build
 ```
-
-## Publishing new versions
-
-1. Ensure you have a `GH_TOKEN` env var containing a GitHub [Personal Access Token](https://github.com/settings/tokens) with `public_repo` permissions
-2. You'll also need a valid [Docker Hub](https://hub.docker.com) login with sufficient permissions to publish new Docker images to the [ipfs/js-ipfs](https://hub.docker.com/repository/docker/ipfs/js-ipfs) repository
-3. From the root of this repo run `npm run release` and follow the on screen prompts.  It will use [conventional commits](https://www.conventionalcommits.org) to work out the new package version
-
-## Using prerelease versions
-
-Any changed packages from each successful build of master are published to npm as canary builds under the npm tag `next`.
-
-## Testing strategy
-
-This project has a number of components that have their own tests, then some components that share interface tests.
-
-When adding new features you may need to add tests to one or more of the test suites described below.
-
-### CLI
-
-Tests live in [/packages/ipfs/test/cli](https://github.com/ipfs/js-ipfs/tree/master/packages/ipfs/test/cli).
-
-All interactions with IPFS core are stubbed so we just ensure that the correct arguments are passed in
-
-### HTTP API
-
-Tests live in [/packages/ipfs/test/http-api](https://github.com/ipfs/js-ipfs/tree/master/packages/ipfs/test/http-api) and are similar to the CLI tests in that we stub out core interactions and inject requests with [shot](https://www.npmjs.com/package/@hapi/shot).
-
-### Core
-
-Anything non-implementation specific should be considered part of the 'Core API'.  For example node setup code is not Core, but anything that does useful work, e.g. network/repo/etc interactions would be Core.
-
-All Core APIs should be documented in [/docs/core-api](https://github.com/ipfs/js-ipfs/tree/master/docs/core-api).
-
-All Core APIs should have comprehensive tests in [/packages/interface-ipfs-core](https://github.com/ipfs/js-ipfs/tree/master/packages/interface-ipfs-core).
-
-`interface-ipfs-core` should ensure API compatibility across implementations. Tests are run:
-
-1. Against [/packages/ipfs/src/core](https://github.com/ipfs/js-ipfs/tree/master/packages/ipfs/src/core) directly
-1. Against [/packages/ipfs/src/http](https://github.com/ipfs/js-ipfs/tree/master/packages/ipfs/src/http) over HTTP via `ipfs-http-client`
-1. Against `go-ipfs` over HTTP via `ipfs-http-client`
-
-### Non-Core
-
-Any non-core API functionality should have tests in the `tests` directory of the module in question, for example: [/packages/ipfs-http-api/tests](https://github.com/ipfs/js-ipfs/tree/master/packages/ipfs-http-client/test) and [/packages/ipfs/tests](https://github.com/ipfs/js-ipfs/tree/master/packages/ipfs/test) for `ipfs-http-client` and `ipfs` respectively.
