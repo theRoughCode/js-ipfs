@@ -12,7 +12,8 @@ exports.bitswap = {
   stat: require('./bitswap/stat'),
   unwant: require('./bitswap/unwant'),
   wantlist: require('./bitswap/wantlist'),
-  wantlistForPeer: require('./bitswap/wantlist-for-peer')
+  wantlistForPeer: require('./bitswap/wantlist-for-peer'),
+  ledgerForPeer: require('./bitswap/ledger-for-peer')
 }
 exports.bootstrap = {
   add: require('./bootstrap/add'),
