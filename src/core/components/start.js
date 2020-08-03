@@ -247,7 +247,8 @@ function createApi ({
       unwant: Components.bitswap.unwant({ bitswap }),
       wantlist: Components.bitswap.wantlist({ bitswap }),
       wantlistForPeer: Components.bitswap.wantlistForPeer({ bitswap }),
-      ledgerForPeer: Components.bitswap.ledgerForPeer({ bitswap })
+      ledgerForPeer: Components.bitswap.ledgerForPeer({ bitswap }),
+      Bitswap: bitswap,
     },
     block,
     bootstrap: {
